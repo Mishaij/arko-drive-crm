@@ -1,0 +1,91 @@
+{% load static %}
+<!doctype html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101e1b">
+  <title>Գրանցումներ — Arko Drive</title>
+  <link rel="stylesheet" href="{% static 'main/css/booking.css' %}">
+  <link rel="stylesheet" href="{% static 'main/css/booking-list.css' %}">
+</head>
+<body>
+<main class="records-shell">
+  <header class="records-header">
+    <div>
+      <span class="eyebrow">Arko Drive CRM</span>
+      <h1>Դասերի գրանցումներ</h1>
+      <p>Որոնեք աշակերտին անունով, ազգանունով կամ հեռախոսահամարով։</p>
+    </div>
+    <a class="new-booking" href="{% url 'main:booking_create' %}">Նոր գրանցում</a>
+  </header>
+
+  {% if messages %}
+    <div class="messages" aria-live="polite">
+      {% for message in messages %}<div class="message">{{ message }}</div>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form class="search" method="get" role="search">
+    <label class="sr-only" for="search-input">Որոնում</label>
+    <input id="search-input" type="search" name="q" value="{{ query }}" placeholder="Անուն, ազգանուն կամ հեռախոսահամար" autocomplete="off">
+    <label class="date-filter">Սկսած<input type="date" name="date_from" value="{{ date_from }}"></label>
+    <label class="date-filter">Մինչև<input type="date" name="date_to" value="{{ date_to }}"></label>
+    <button type="submit">Որոնել</button>
+    {% if query or date_from or date_to %}<a class="clear-search" href="{% url 'main:booking_list' %}">Մաքրել</a>{% endif %}
+  </form>
+
+  <form class="day-pdf" method="get" action="{% url 'main:day_pdf' %}">
+    <div>
+      <strong>Օրվա ընդհանուր PDF</strong>
+      <span>Ընտրեք օրը՝ բոլոր գրանցումները մեկ PDF ֆայլով ներբեռնելու համար։</span>
+    </div>
+    <label><span class="sr-only">Ամսաթիվ</span><input type="date" name="date" value="{{ date_from }}" required></label>
+    <button type="submit"><span class="download-icon" aria-hidden="true"></span> Ներբեռնել օրվա PDF</button>
+  </form>
+
+  <section class="records-card" aria-label="Գրանցումների ցանկ">
+    <div class="result-meta">
+      <strong>{{ bookings|length }}</strong> գրանցում
+      {% if query %}<span>«{{ query }}» որոնման համար</span>{% endif %}
+      {% if date_from or date_to %}<span>{{ date_from|default:"…" }} — {{ date_to|default:"…" }}</span>{% endif %}
+    </div>
+
+    {% if bookings %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Աշակերտ</th>
+              <th>Հեռախոս</th>
+              <th>Ամսաթիվ և ժամ</th>
+              <th>Հրահանգիչ</th>
+              <th>Մեքենա</th>
+              <th>Վճարում</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+              <tr>
+                <td data-label="Աշակերտ"><strong>{{ booking.first_name }} {{ booking.last_name }}</strong></td>
+                <td data-label="Հեռախոս"><a class="phone" href="tel:{{ booking.phone }}">{{ booking.phone }}</a></td>
+                <td data-label="Ամսաթիվ և ժամ">{{ booking.lesson_date|date:"d.m.Y" }}<span class="muted">{{ booking.lesson_time|time:"H:i" }}</span></td>
+                <td data-label="Հրահանգիչ">{{ booking.instructor|default:"—" }}</td>
+                <td data-label="Մեքենա">{{ booking.car }}</td>
+                <td data-label="Վճարում"><strong>{{ booking.amount|floatformat:0 }} ֏</strong><span class="muted">Կանխ․ {{ booking.deposit|default_if_none:0|floatformat:0 }} ֏</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">⌕</div>
+        <h2>{% if query %}Գրանցում չի գտնվել{% else %}Գրանցումներ դեռ չկան{% endif %}</h2>
+        <p>{% if query %}Փորձեք այլ անուն, ազգանուն կամ հեռախոսահամար։{% else %}Ստեղծեք առաջին գրանցումը՝ սեղմելով «Նոր գրանցում»։{% endif %}</p>
+      </div>
+    {% endif %}
+  </section>
+</main>
+</body>
+</html>

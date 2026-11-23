@@ -1,0 +1,62 @@
+{% load static %}
+<!doctype html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Վարորդական դասի գրանցում">
+  <meta name="theme-color" content="#101e1b">
+  <title>Վարորդական դասի գրանցում</title>
+  <link rel="stylesheet" href="{% static 'main/css/booking.css' %}">
+</head>
+<body>
+<main class="layout">
+  <section class="card" aria-labelledby="form-title">
+    <header>
+      <div class="header-row">
+        <h2 id="form-title">Նոր գրանցում</h2>
+        <a class="records-link" href="{% url 'main:booking_list' %}">Բոլոր գրանցումները</a>
+      </div>
+      <p>Աստղանիշով նշված դաշտերը պարտադիր են։</p>
+    </header>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+
+      <fieldset>
+        <legend>Աշակերտի տվյալներ</legend>
+        <div class="grid">
+          <label>Անուն <b>*</b>{{ form.first_name }}{% for error in form.first_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+          <label>Ազգանուն <b>*</b>{{ form.last_name }}{% for error in form.last_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+          <label class="wide">Հեռախոսահամար <b>*</b>{{ form.phone }}{% for error in form.phone.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Դասի մանրամասներ</legend>
+        <div class="grid">
+          <label>Ամիս, ամսաթիվ <b>*</b>{{ form.lesson_date }}{% for error in form.lesson_date.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+          <label>Ժամ <b>*</b>{{ form.lesson_time }}{% for error in form.lesson_time.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+          <label>Հրահանգիչ <small>Ոչ պարտադիր</small>{{ form.instructor }}{% for error in form.instructor.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+          <label>Մեքենա <b>*</b>{{ form.car }}{% for error in form.car.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Վճարում</legend>
+        <div class="grid">
+          <label>Գումար <b>*</b><span class="money">{{ form.amount }}<span>֏</span></span>{% for error in form.amount.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+          <label>Կանխավճար <small>Ոչ պարտադիր</small><span class="money">{{ form.deposit }}<span>֏</span></span>{% for error in form.deposit.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</label>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button class="save-button" type="submit" name="action" value="save">Պահպանել գրանցումը</button>
+        <button type="submit" name="action" value="download_pdf"><span class="download-icon" aria-hidden="true"></span> Ներբեռնել PDF</button>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>
